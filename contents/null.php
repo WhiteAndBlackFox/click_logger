@@ -1,3 +1,3 @@
-<?php
-	echo "Тебя тут не должно быть!";
-?>
+		<div id="lable">I am not exist!</div>
+		<div id="content"></div>
+		

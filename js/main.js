@@ -8,10 +8,29 @@ $(document).ready(function() {
            		data: { type: "set_page", to_page: to_page },
            		dataType: "text",
            		success: function(data){
-           			location.reload();
+           			$.get("contents/"+to_page+".php", function(data){
+						$("#contents").html(data);
+					});
            		}
            });
     });
 
+    $("#contents").click(function() {
+		$.ajax({
+			url: "moduls/functions.php",
+           	method: "GET",
+       		data: { type: "add_click" },
+       		dataType: "text"
+		});
+    });
+
+    setInterval(function(){
+    	$.ajax({
+    		url: "moduls/functions.php",
+    		method: "GET",
+    		data: { type: "set_click" },
+    		dataType: "json"
+    	});
+    }, 10000);
 
 });
