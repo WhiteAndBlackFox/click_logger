@@ -16,7 +16,8 @@ include "moduls/simple_html_dom.php";
 		<div id="head">
 			<div id="text_head">Clicker</div>
 			<div id="navs">
-				<div class="button" id="auth" name="auth">Sign up</div>
+				<div class="button" id="statpoints" name="statpoints">Статистика по точкам</div>
+				<div class="button" id="statips" name="statips">Статистика по IP</div>
 			</div>
 		</div>
 		<div id="box">
@@ -26,7 +27,7 @@ include "moduls/simple_html_dom.php";
 		    			$dir = opendir('contents');
 		    			$dirFiles = array();
 		    			while($file = readdir($dir)) {
-		    				if ($file != '.' && $file != '..' && $file != 'null.php') {
+		    				if ($file != '.' && $file != '..' && $file != 'null.php' && $file != 'statpoints.php' && $file != 'statips.php') {
 		    					$html = file_get_html("contents/$file");
 		    					$ret = $html->find('div[id=lable]');
 		    					$label = $ret[0]->plaintext;
