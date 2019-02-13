@@ -7,17 +7,16 @@ include "moduls/simple_html_dom.php";
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>CLICKER</title>
+		<title>Click logger</title>
 		<link rel="stylesheet" href="css/index.css">
 	    <script type="text/javascript" src="js/jquery.js"></script>
 	    <script type="text/javascript" src="js/main.js"></script>
 	</head>
 	<body id="body">
 		<div id="head">
-			<div id="text_head">Clicker</div>
+			<div id="text_head">Click logger</div>
 			<div id="navs">
-				<div class="button" id="statpoints" name="statpoints">Статистика по точкам</div>
-				<div class="button" id="statips" name="statips">Статистика по IP</div>
+				<div class="button" id="stats" name="stats">Статистика</div>
 			</div>
 		</div>
 		<div id="box">
@@ -27,7 +26,7 @@ include "moduls/simple_html_dom.php";
 		    			$dir = opendir('contents');
 		    			$dirFiles = array();
 		    			while($file = readdir($dir)) {
-		    				if ($file != '.' && $file != '..' && $file != 'null.php' && $file != 'statpoints.php' && $file != 'statips.php') {
+		    				if ($file != '.' && $file != '..' && $file != 'null.php' && $file != 'stats.php') {
 		    					$html = file_get_html("contents/$file");
 		    					$ret = $html->find('div[id=lable]');
 		    					$label = $ret[0]->plaintext;

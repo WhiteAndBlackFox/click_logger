@@ -14,14 +14,98 @@ switch ($_GET['type']) {
 	case 'auth':
 		auth();
 		break;
+	case 'load_data_moduls':
+		load_data_moduls();
+		break;
+	case 'load_data_ip':
+		load_data_ip();
+		break;
+	case 'data_page_ip':
+		data_page_ip();
+		break;
+	case 'data_ip_page':
+		data_ip_page();
+		break;
 	default:
 		null();
 		break;
 }
 
+function data_ip_page(){
+	$table_page_ip = "";
+	
+	$db = new SQLite3('../click_logger.db', SQLITE3_OPEN_READONLY);
+	$sql_s_ip_page = $db->prepare("SELECT p.name_page , ip.count_click FROM ips_pages ip LEFT JOIN pages p ON p.idpages = ip. idips_pages WHERE ip.idip = :selectedip");
+	$sql_s_ip_page->bindValue(':selectedip', $_GET['selectedip']);
+	$res_s_ip_page = $sql_s_ip_page->execute();
+
+	while($s_page_ip = $res_s_ip_page->fetchArray()){
+		$click_minute = number_format(floatval($s_page_ip['count_click']) / floatval(60), 2, ',', ' ');
+		$table_page_ip .= "<tr><td>{$s_page_ip['name_page']}</td><td>$click_minute</td></tr>";
+	}
+	$db->close();
+
+	$json = array('table_page_ip' => $table_page_ip);
+	echo json_encode($json);
+}
+
+function data_page_ip(){
+	$table_page_ip = "";
+	
+	$db = new SQLite3('../click_logger.db', SQLITE3_OPEN_READONLY);
+	$sql_s_page_ip = $db->prepare("SELECT i.ip, ip.count_click FROM ips_pages ip LEFT JOIN ips i ON i.idip = ip.idip WHERE ip.idips_pages = :selectedpage");
+	$sql_s_page_ip->bindValue(':selectedpage', $_GET['selectedpage']);
+	$res_s_page_ip = $sql_s_page_ip->execute();
+
+	while($s_page_ip = $res_s_page_ip->fetchArray()){
+		$click_minute = number_format(floatval($s_page_ip['count_click']) / floatval(60), 2, ',', ' ');
+		$table_page_ip .= "<tr><td>{$s_page_ip['ip']}</td><td>$click_minute</td></tr>";
+	}
+	$db->close();
+
+	$json = array('table_page_ip' => $table_page_ip);
+	echo json_encode($json);
+}
+
+function load_data_ip(){
+	$table_ip = "";
+	$ip_options= "";
+
+	$db = new SQLite3('../click_logger.db', SQLITE3_OPEN_READONLY);
+	$sql_s_ip = $db->prepare("SELECT * FROM ips");
+	$res_s_ip = $sql_s_ip->execute();
+
+	while($s_ip = $res_s_ip->fetchArray()){
+		$table_ip .= "<tr><td>{$s_ip['idip']}</td><td>{$s_ip['ip']}</td></tr>";
+		$ip_options .= "<option value='{$s_ip['idip']}'>{$s_ip['ip']}</option>";
+	}
+	$db->close();
+
+	$json = array('table_ip' => $table_ip, 'ip_options'=> $ip_options);
+	echo json_encode($json);
+}
+
+function load_data_moduls(){
+	$table_pages = "";
+	$page_options = "";
+	
+	$db = new SQLite3('../click_logger.db', SQLITE3_OPEN_READONLY);
+	$sql_s_page = $db->prepare("SELECT * FROM pages WHERE name_page <> 'stats'");
+	$res_s_page = $sql_s_page->execute();
+
+	while($s_page = $res_s_page->fetchArray()){
+		$table_pages .= "<tr><td>{$s_page['idpages']}</td><td>{$s_page['name_page']}</td></tr>";
+		$page_options .= "<option value='{$s_page['idpages']}'>{$s_page['name_page']}</option>";
+	}
+	$db->close();
+
+	$json = array('table_pages' => $table_pages, 'page_options'=> $page_options);
+	echo json_encode($json);
+}
+
 function set_click(){
 	if (is_array($_SESSION['click']) && count($_SESSION['click']) > 0){
-		$db = new SQLite3('../clicker.db', SQLITE3_OPEN_READWRITE);
+		$db = new SQLite3('../click_logger.db', SQLITE3_OPEN_READWRITE);
 		foreach($_SESSION['click'] as $page => $count){
 			/*--------------------------------------------------------------------------*/
 			/*                             pages                                        */
@@ -94,10 +178,12 @@ function set_click(){
 }
 
 function add_click(){
-	if (is_null($_SESSION['click'][$_SESSION['page']])){
-		$_SESSION['click'][$_SESSION['page']] = 0;
+	if ($_SESSION['page'] != 'stats'){
+		if (is_null($_SESSION['click'][$_SESSION['page']])){
+			$_SESSION['click'][$_SESSION['page']] = 0;
+		}
+		$_SESSION['click'][$_SESSION['page']] += 1;
 	}
-	$_SESSION['click'][$_SESSION['page']] += 1;
 }
 
 function set_page(){
